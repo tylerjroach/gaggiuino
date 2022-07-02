@@ -116,8 +116,8 @@ eepromValues_t getEepromDefaults(void) {
   defaultData.homeOnShotFinish         = true;
   defaultData.graphBrew                = true;
   defaultData.brewDeltaState           = true;
-  defaultData.scalesF1                 = 4000;
-  defaultData.scalesF2                 = 4000;
+  defaultData.scalesF1                 = 4210;
+  defaultData.scalesF2                 = 3920;
 
   return defaultData;
 }
