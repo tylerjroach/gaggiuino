@@ -38,9 +38,7 @@
   #define brewPin A0 // PD7
   #define pressurePin A1
   #define HX711_dout_1 12 //mcu > HX711 no 1 dout pin
-  #define HX711_dout_2 13 //mcu > HX711 no 2 dout pin
   #define HX711_sck_1 10 //mcu > HX711 no 1 sck pin
-  #define HX711_sck_2 11 //mcu > HX711 no 2 sck pin
   #define USART_CH Serial
 
   #if defined(TIMERINTERRUPT_ENABLED)
@@ -75,9 +73,7 @@
   #define pressurePin ADS115_A0 //set here just for reference
   #define steamPin PA12
   #define HX711_sck_1 PB0 //mcu > HX711 no 1 sck pin
-  #define HX711_sck_2 PB1 //mcu > HX711 no 2 sck pin
   #define HX711_dout_1 PA1 //mcu > HX711 no 1 dout pin
-  #define HX711_dout_2 PA2 //mcu > HX711 no 2 dout pin
   #define USART_CH Serial1
   //#define // USART_CH1 Serial
 #endif
@@ -121,7 +117,6 @@ PSM pump(zcPin, dimmerPin, PUMP_RANGE, ZC_MODE, 2);
 HX711_2 LoadCells;
 #else
 HX711 LoadCell_1; //HX711 1
-HX711 LoadCell_2; //HX711 2
 #endif
 
 
@@ -342,7 +337,7 @@ void calculateWeight() {
           currentWeight = values[0] + values[1];
         }
       #else
-        currentWeight = LoadCell_1.get_units() + LoadCell_2.get_units();
+        currentWeight = LoadCell_1.get_units();
       #endif
       // Resume pumping
       //pump.set(pumpValue);
@@ -1080,7 +1075,7 @@ void brewDetect() {
 void scalesInit() {
 
   #if defined(SINGLE_HX711_CLOCK)
-    LoadCells.begin(HX711_dout_1, HX711_dout_2, HX711_sck_1);
+    LoadCells.begin(HX711_dout_1, HX711_sck_1);
     LoadCells.set_scale(scalesF1, scalesF2);
     LoadCells.power_up();
 
@@ -1092,16 +1087,13 @@ void scalesInit() {
     }
   #else
     LoadCell_1.begin(HX711_dout_1, HX711_sck_1);
-    LoadCell_2.begin(HX711_dout_2, HX711_sck_2);
     LoadCell_1.set_scale(scalesF1); // calibrated val1
-    LoadCell_2.set_scale(scalesF2); // calibrated val2
 
     delay(500);
 
-    if (LoadCell_1.is_ready() && LoadCell_2.is_ready()) {
+    if (LoadCell_1.is_ready()) {
       scalesPresent = true;
       LoadCell_1.tare();
-      LoadCell_2.tare();
     }
   #endif
 }
@@ -1111,9 +1103,8 @@ void scalesTare() {
     #if defined(SINGLE_HX711_CLOCK)
       if (LoadCells.is_ready()) LoadCells.tare(5);
     #else
-      if (LoadCell_1.wait_ready_timeout(300) && LoadCell_2.wait_ready_timeout(300)) {
+      if (LoadCell_1.wait_ready_timeout(300)) {
         LoadCell_1.tare(2);
-        LoadCell_2.tare(2);
       }
     #endif
     tareDone=1;
@@ -1300,7 +1291,6 @@ void pinInit() {
   pinMode(brewPin, INPUT_PULLUP);
   pinMode(steamPin, INPUT_PULLUP);
   pinMode(HX711_dout_1, INPUT_PULLUP);
-  pinMode(HX711_dout_2, INPUT_PULLUP);
 }
 
 void dbgInit() {
