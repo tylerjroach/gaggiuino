@@ -20,5 +20,6 @@
 
 #define USART_LCD     Serial2 // PA2 & PA3
 #define USART_DEBUG   Serial  // USB-CDC
+#define USART_ESP32   Serial1 // PA9 & PA10
 
 #endif

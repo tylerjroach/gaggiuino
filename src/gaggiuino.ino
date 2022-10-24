@@ -42,6 +42,9 @@ void setup(void) {
   lcdInit();
   LOG_INFO("LCD Init");
 
+  espInit();
+  LOG_INFO("ESP Init");
+
 #if defined(DEBUG_ENABLED)
   // Debug init if enabled
   dbgInit();
@@ -339,13 +342,16 @@ static void lcdRefresh(void) {
 #endif
 
     /*LCD timer and warmup*/
+    unsigned long currentBrewMillis = (millis() > brewingTimer) ? (int)((millis() - brewingTimer) / 1000) : 0;
     if (brewActive) {
-      lcdSetBrewTimer((millis() > brewingTimer) ? (int)((millis() - brewingTimer) / 1000) : 0);
+      lcdSetBrewTimer(currentBrewMillis);
       lcdBrewTimerStart(); // nextion timer start
       lcdWarmupStateStop(); // Flagging warmup notification on Nextion needs to stop (if enabled)
     } else {
       lcdBrewTimerStop(); // nextion timer stop
     }
+
+    sendEspSensorUpdate(runningCfg, currentState, brewActive, scalesIsPresent, currentBrewMillis);
 
     pageRefreshTimer = millis() + REFRESH_SCREEN_EVERY;
   }
